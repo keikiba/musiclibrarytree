@@ -1,0 +1,1 @@
+/var/lib/mpd    IN_CLOSE_WRITE,IN_NO_LOOP       /data/music/Resources/script/update.sh $#

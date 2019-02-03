@@ -1,0 +1,34 @@
+#
+# mpd-dbparser.stt
+#   State transition table for mklibrarytree.pl
+#
+# state		regExp		event		function	nextState	validEvents
+
+initialState	^info_begin$	infoEvent	infoHandler	infoState	formatEvent|mpdVerEvent|fsCharsetEvent|endInfoEvent
+
+#
+infoState	^format:\s(.+)$		formatEvent	formatHandler		infoState	mpdVerEvent|endInfoEvent
+infoState	^mpd_version:\s(.+)$	mpdVerEvent	mpdVerHandler		infoState	fsCharsetEvent|endInfoEvent
+infoState	^fs_charset:\s(.+)$	fsCharsetEvent	fsCharsetHandler	infoState	tagEvent|endInfoEvent
+infoState	^tag:\s(.+)$		tagEvent	tagHandler		infoState	tagEvent|endInfoEvent
+infoState	^info_end$		endInfoEvent	endInfoHandler		commandState	commandList
+
+commandState	^directory:\s(.+)$	directoryEvent	directoryHandler	commandState	dirMtimeEvent
+commandState	^mtime:\s(.+)$		dirMtimeEvent	mtimeHandler		commandState	beginEvent
+commandState	^begin:\s(.+)$		beginEvent	beginHandler		commandState	directoryEvent|bSongEvent
+commandState	^end:\s(.+)$		endEvent	endHandler		commandState	directoryEvent|endEvent|EOFEvent
+commandState	^song_begin:\s(.+)$	bSongEvent	bSongHandler		songState	songTimeEvent|eSongEvent
+
+songState	^song_end$		eSongEvent	eSongHandler		commandState	bSongEvent|endEvent|EOFEvent
+songState	^Time:\s(.+)$		songTimeEvent	songTimeHandler		songState	songTitleEvent|songArtistEvent|songDateEvent|songAlbumEvent|songGenreEvent|songTrackEvent|songComposerEvent|songDiscEvent|songMtimeEvent|eSongEvent
+songState	^Title:\s(.+)$		songTitleEvent	songTitleHandler	songState	songTitleEvent|songArtistEvent|songDateEvent|songAlbumEvent|songGenreEvent|songTrackEvent|songComposerEvent|songDiscEvent|songMtimeEvent|eSongEvent
+songState	^Artist:\s(.+)$		songArtistEvent	songArtistHandler	songState	songTitleEvent|songArtistEvent|songDateEvent|songAlbumEvent|songGenreEvent|songTrackEvent|songComposerEvent|songDiscEvent|songMtimeEvent|eSongEvent
+songState	^Date:\s(.+)$		songDateEvent	songDateHandler		songState	songTitleEvent|songArtistEvent|songDateEvent|songAlbumEvent|songGenreEvent|songTrackEvent|songComposerEvent|songDiscEvent|songMtimeEvent|eSongEvent
+songState	^Album:\s(.+)$		songAlbumEvent	songAlbumHandler	songState	songTitleEvent|songArtistEvent|songDateEvent|songAlbumEvent|songGenreEvent|songTrackEvent|songComposerEvent|songDiscEvent|songMtimeEvent|eSongEvent
+songState	^Genre:\s(.+)$		songGenreEvent	songGenreHandler	songState	songTitleEvent|songArtistEvent|songDateEvent|songAlbumEvent|songGenreEvent|songTrackEvent|songComposerEvent|songDiscEvent|songMtimeEvent|eSongEvent
+songState	^Track:\s(.+)$		songTrackEvent	songTrackHandler	songState	songTitleEvent|songArtistEvent|songDateEvent|songAlbumEvent|songGenreEvent|songTrackEvent|songComposerEvent|songDiscEvent|songMtimeEvent|eSongEvent
+songState	^Composer:\s(.+)$	songComposerEvent	songComposerHandler	songState	songTitleEvent|songArtistEvent|songDateEvent|songAlbumEvent|songGenreEvent|songTrackEvent|songComposerEvent|songDiscEvent|songMtimeEvent|eSongEvent
+songState	^Disc:\s(.+)$		songDiscEvent	songDiscHandler		songState	songTitleEvent|songArtistEvent|songDateEvent|songAlbumEvent|songGenreEvent|songTrackEvent|songComposerEvent|songDiscEvent|songMtimeEvent|eSongEvent
+songState	^mtime:\s(.+)$		songMtimeEvent	songMtimeHandler	songState	songTitleEvent|songArtistEvent|songDateEvent|songAlbumEvent|songGenreEvent|songTrackEvent|songComposerEvent|songDiscEvent|songMtimeEvent|eSongEvent
+
+# end of table
